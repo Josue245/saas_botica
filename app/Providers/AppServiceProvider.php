@@ -1,0 +1,48 @@
+<?php
+
+namespace App\Providers;
+
+use Carbon\Carbon;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\ServiceProvider;
+
+class AppServiceProvider extends ServiceProvider
+{
+    public function register(): void
+    {
+        //
+    }
+
+    public function boot(): void
+    {
+        // Evita errores de longitud de índice en MySQL < 5.7.7
+        Schema::defaultStringLength(191);
+        Paginator::useTailwind();
+
+        // Comparte el contador de alertas con el menú lateral y la barra superior
+        View::composer(['partials.sidebar', 'partials.topbar'], function ($view) {
+            $count = 0;
+            try {
+                if (Schema::hasTable('productos')) {
+                    $hoy = Carbon::today();
+                    $stockBajo = DB::table('productos')->whereColumn('stock', '<=', 'stock_minimo')->count();
+                    $porVencer = DB::table('productos')
+                        ->whereNotNull('fecha_vencimiento')
+                        ->whereBetween('fecha_vencimiento', [$hoy, (clone $hoy)->addDays(60)])
+                        ->count();
+                    $vencidos = DB::table('productos')
+                        ->whereNotNull('fecha_vencimiento')
+                        ->whereDate('fecha_vencimiento', '<', $hoy)
+                        ->count();
+                    $count = $stockBajo + $porVencer + $vencidos;
+                }
+            } catch (\Throwable $e) {
+                $count = 0;
+            }
+            $view->with('alertasCount', $count);
+        });
+    }
+}

@@ -1,0 +1,11 @@
+bk_basededatos.sql
+vendor
+node_modules
+storage
+bootstrap/cache
+.env
+*.zip
+*.png
+*.jpg
+*.jpeg
+*.pdf
