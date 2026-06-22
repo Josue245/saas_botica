@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class CajaMovimiento extends Model
 {
+    use HasTenant;
     protected $table = 'caja_movimientos';
     protected $fillable = ['caja_sesion_id', 'user_id', 'tipo', 'concepto', 'monto'];
     protected $casts = ['monto' => 'decimal:2'];
