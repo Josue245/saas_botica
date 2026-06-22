@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\DB;
 
 class Correlativo extends Model
 {
+    protected $table = 'correlativos';
+
     protected $fillable = [
         'tenant_id', 'sucursal_id', 'tipo', 'serie', 'ultimo',
     ];

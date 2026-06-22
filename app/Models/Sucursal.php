@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Sucursal extends Model
 {
+    protected $table = 'sucursales';
+
     protected $fillable = [
         'tenant_id', 'nombre', 'direccion', 'ubigeo',
         'telefono', 'activo', 'serie_boleta', 'serie_factura',

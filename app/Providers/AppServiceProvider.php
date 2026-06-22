@@ -26,6 +26,7 @@ class AppServiceProvider extends ServiceProvider
 
         // Comparte el contador de alertas con el menú lateral y la barra superior
         View::composer(['partials.sidebar', 'partials.topbar'], function ($view) {
+            if (!app()->bound('tenant') || app('tenant') === null) return;
             $count = 0;
             try {
                 if (Schema::hasTable('productos')) {

@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Suscripcion extends Model
 {
+    protected $table = 'suscripciones';
+
     protected $fillable = [
         'tenant_id', 'plan_id', 'estado', 'inicia_at',
         'expira_at', 'precio_pagado', 'moneda',

@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Plan extends Model
 {
+    protected $table = 'planes';
+
     protected $fillable = [
         'nombre', 'slug', 'precio_mensual',
         'max_usuarios', 'max_sucursales', 'max_productos',

@@ -9,6 +9,8 @@ class StockSucursal extends Model
 {
     public $timestamps = false;
 
+    protected $table = 'stock_sucursales';
+
     protected $fillable = [
         'tenant_id', 'sucursal_id', 'producto_id', 'stock', 'stock_minimo',
     ];

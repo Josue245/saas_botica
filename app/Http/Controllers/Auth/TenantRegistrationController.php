@@ -66,8 +66,8 @@ class TenantRegistrationController extends Controller
                     'serie_factura' => 'F001',
                 ]);
 
-                // 3. Usuario admin (insert directo para evitar scope en creación)
-                $user = User::sinTenant()->newModelInstance([
+                // 3. Usuario admin (insert directo sin scope)
+                $userId = DB::table('users')->insertGetId([
                     'tenant_id'   => $tenant->id,
                     'sucursal_id' => $sucursal->id,
                     'name'        => $data['nombre_admin'],
@@ -75,8 +75,10 @@ class TenantRegistrationController extends Controller
                     'password'    => Hash::make($data['password']),
                     'rol'         => 'admin',
                     'activo'      => true,
+                    'created_at'  => now(),
+                    'updated_at'  => now(),
                 ]);
-                $user->save();
+                $user = User::withoutGlobalScopes()->find($userId);
 
                 // 4. Configuraciones por defecto
                 foreach (Configuracion::defaults() as $clave => $valor) {
