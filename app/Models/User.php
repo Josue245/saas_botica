@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\Auditable;
+use App\Models\Concerns\HasTenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -11,7 +12,7 @@ class User extends Authenticatable
 {
     use Auditable;
 
-    /** @use HasTenant, HasFactory<\Database\Factories\UserFactory> */
+    use HasTenant, HasFactory;
     use HasFactory, Notifiable;
 
     protected $fillable = [

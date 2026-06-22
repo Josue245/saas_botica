@@ -44,6 +44,8 @@ class PersonalController extends Controller
             'telefono' => $data['telefono'] ?? null,
             'password' => Hash::make($data['password']),
             'activo' => $request->boolean('activo', true),
+            'tenant_id' => app()->bound('tenant') ? app('tenant')->id : null,
+            'sucursal_id' => auth()->user()->sucursal_id ?? null,
         ]);
 
         return redirect()->route('personal.index')->with('ok', 'Usuario creado correctamente.');
