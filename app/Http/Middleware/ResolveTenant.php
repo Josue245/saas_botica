@@ -40,6 +40,7 @@ class ResolveTenant
         }
 
         $this->manager->set($tenant);
+        \Illuminate\Support\Facades\Log::info("ResolveTenant: tenant activo = " . $tenant->slug . " (id=" . $tenant->id . ")");
 
         // Resolver sucursal activa del usuario autenticado
         if (auth()->check() && auth()->user()->sucursal_id) {
@@ -78,6 +79,11 @@ class ResolveTenant
         // 4. Por query param (solo local, para pruebas rápidas en el navegador)
         if (config('app.env') === 'local' && $slug = $request->query('_tenant')) {
             return Tenant::where('slug', $slug)->first();
+        }
+
+        // 5. Desde usuario autenticado (la forma más confiable)
+        if (auth()->check() && auth()->user()->tenant_id) {
+            return Tenant::find(auth()->user()->tenant_id);
         }
 
         return null;

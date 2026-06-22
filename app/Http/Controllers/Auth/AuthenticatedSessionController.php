@@ -30,17 +30,33 @@ class AuthenticatedSessionController extends Controller
 
         $remember = $request->boolean('remember');
 
-        if (! Auth::attempt(array_merge($credentials, ['activo' => true]), $remember)) {
+        // Filtrar por tenant activo si hay uno en el contexto
+        $tenantId = app()->bound('tenant') && app('tenant') ? app('tenant')->id : null;
+        $credencialesCompletas = array_merge($credentials, ['activo' => true]);
+        if ($tenantId) {
+            $credencialesCompletas['tenant_id'] = $tenantId;
+        }
+        if (! Auth::attempt($credencialesCompletas, $remember)) {
             throw ValidationException::withMessages([
                 'email' => 'Las credenciales no coinciden o el usuario está inactivo.',
             ]);
         }
 
         $request->session()->regenerate();
+        // Guardar tenant en sesion para persistir entre requests
+        if (app()->bound("tenant") && app("tenant")) {
+            $request->session()->put("tenant_id", app("tenant")->id);
+        } elseif (Auth::user()->tenant_id) {
+            $request->session()->put("tenant_id", Auth::user()->tenant_id);
+        }
 
         Auditoria::registrar('inició sesión', 'Sesión', Auth::id(), 'Acceso al sistema');
 
-        return redirect()->intended(route('dashboard'));
+        $tenant = app()->bound('tenant') && app('tenant') ? app('tenant') : Auth::user()->tenant;
+        $redirectUrl = $tenant
+            ? route('dashboard') . '?_tenant=' . $tenant->slug
+            : route('dashboard');
+        return redirect()->intended($redirectUrl);
     }
 
     public function destroy(Request $request): RedirectResponse
