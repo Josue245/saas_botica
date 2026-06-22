@@ -3,12 +3,13 @@
 namespace App\Models;
 
 use App\Models\Concerns\Auditable;
+use App\Models\Concerns\HasTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AjusteInventario extends Model
 {
-    use Auditable;
+    use HasTenant, Auditable;
 
     protected $table = 'ajuste_inventarios';
     protected $fillable = [

@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Schema;
 
 class Configuracion extends Model
 {
+    use HasTenant;
     protected $table = 'configuraciones';
     protected $fillable = ['clave', 'valor'];
 

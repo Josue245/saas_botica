@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class VentaDetalle extends Model
 {
+    use HasTenant;
     protected $table = 'venta_detalles';
     protected $fillable = ['venta_id', 'producto_id', 'descripcion', 'cantidad', 'precio_unitario', 'subtotal'];
     protected $casts = [

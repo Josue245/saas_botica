@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class CompraDetalle extends Model
 {
+    use HasTenant;
     protected $table = 'compra_detalles';
     protected $fillable = [
         'compra_id', 'producto_id', 'descripcion', 'cantidad',

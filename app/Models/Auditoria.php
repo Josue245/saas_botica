@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Auth;
 
 class Auditoria extends Model
 {
+    use HasTenant;
     protected $table = 'auditorias';
     protected $fillable = ['user_id', 'accion', 'modelo', 'modelo_id', 'descripcion', 'ip'];
 
