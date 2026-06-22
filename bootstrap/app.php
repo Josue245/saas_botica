@@ -11,6 +11,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->append(\App\Http\Middleware\ResolveTenant::class);
+        $middleware->alias([
+            'tenant.active' => \App\Http\Middleware\EnsureTenantActive::class,
+        ]);
         $middleware->alias([
             'role' => \App\Http\Middleware\EnsureUserHasRole::class,
         ]);

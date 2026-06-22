@@ -1,4 +1,5 @@
 <?php
+use App\Http\Controllers\Auth\TenantRegistrationController;
 
 use App\Http\Controllers\AlertaController;
 use App\Http\Controllers\AuditoriaController;
@@ -87,3 +88,8 @@ Route::middleware('auth')->group(function () {
     });
     Route::get('/facturacion', ModuloController::class)->name('facturacion.index');
 });
+
+// === REGISTRO DE NUEVO TENANT (onboarding) ===
+Route::get('/register', [TenantRegistrationController::class, 'create'])->name('register.tenant.form');
+Route::post('/register', [TenantRegistrationController::class, 'store'])->name('register.tenant');
+Route::get('/suspendido', fn() => view('billing.suspendido'))->name('billing.suspendido');
