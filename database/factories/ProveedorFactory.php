@@ -13,7 +13,7 @@ class ProveedorFactory extends Factory
     {
         return [
             'razon_social' => fake()->company() . ' S.A.C.',
-            'ruc' => fake()->unique()->numerify('20###########'),
+            'ruc' => fake()->unique()->numerify('20#########'),
             'contacto' => fake()->name(),
             'telefono' => fake()->numerify('9########'),
             'email' => fake()->companyEmail(),
