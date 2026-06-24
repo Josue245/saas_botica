@@ -13,8 +13,10 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'tenant.active' => \App\Http\Middleware\EnsureTenantActive::class,
+            'plan.limit'   => \App\Http\Middleware\CheckPlanLimits::class,
         ]);
         $middleware->appendToGroup("web", \App\Http\Middleware\ResolveTenant::class);
+        $middleware->validateCsrfTokens(except: ["webhook/culqi"]);
         $middleware->alias([
             'role' => \App\Http\Middleware\EnsureUserHasRole::class,
         ]);

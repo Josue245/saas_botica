@@ -18,4 +18,9 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+    'culqi' => [
+        'public_key'     => env('CULQI_PUBLIC_KEY', ''),
+        'secret_key'     => env('CULQI_SECRET_KEY', ''),
+        'webhook_secret' => env('CULQI_WEBHOOK_SECRET', ''),
+    ],
 ];
