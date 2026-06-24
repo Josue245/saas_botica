@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Compra;
+use App\Models\Venta;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -37,5 +39,15 @@ class Sucursal extends Model
     public function stockProductos(): HasMany
     {
         return $this->hasMany(StockSucursal::class);
+    }
+
+    public function ventas(): HasMany
+    {
+        return $this->hasMany(Venta::class);
+    }
+
+    public function compras(): HasMany
+    {
+        return $this->hasMany(Compra::class);
     }
 }

@@ -1,6 +1,8 @@
 <?php
 use App\Http\Controllers\Auth\TenantRegistrationController;
 use App\Http\Controllers\BillingController;
+use App\Http\Controllers\SucursalController;
+use App\Http\Controllers\StockSucursalController;
 
 use App\Http\Controllers\AlertaController;
 use App\Http\Controllers\AuditoriaController;
@@ -103,3 +105,17 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/billing/historial', [BillingController::class, 'historial'])->name('billing.historial');
 });
 Route::post('/webhook/culqi', [BillingController::class, 'webhook'])->name('billing.webhook');
+
+// === SUCURSALES ===
+Route::middleware(['auth'])->group(function () {
+    Route::get('/sucursales', [SucursalController::class, 'index'])->name('sucursales.index');
+    Route::post('/sucursales', [SucursalController::class, 'store'])->name('sucursales.store');
+    Route::patch('/sucursales/{sucursal}', [SucursalController::class, 'update'])->name('sucursales.update');
+    Route::delete('/sucursales/{sucursal}', [SucursalController::class, 'destroy'])->name('sucursales.destroy');
+    Route::patch('/sucursales/{sucursal}/cambiar', [SucursalController::class, 'cambiar'])->name('sucursales.cambiar');
+
+    // Stock por sucursal
+    Route::get('/stock-sucursales', [StockSucursalController::class, 'index'])->name('stock.sucursales.index');
+    Route::post('/stock-sucursales/transferir', [StockSucursalController::class, 'transferir'])->name('stock.sucursales.transferir');
+    Route::post('/stock-sucursales/poblar', [StockSucursalController::class, 'poblarDesdeProductos'])->name('stock.sucursales.poblar');
+});
