@@ -22,7 +22,13 @@ class BillingController extends Controller
      */
     public function index(): View
     {
-        $tenant = $this->tenantManager->get();
+        $tenant = $this->tenantManager->get() ?? auth()->user()?->tenant;
+        \Illuminate\Support\Facades\Log::info("BillingController tenant", [
+            "manager" => $this->tenantManager->get()?->id,
+            "auth_tenant" => auth()->user()?->tenant_id,
+            "tenant" => $tenant?->id,
+        ]);
+        if (!$tenant) return redirect()->route('login');
         $planes = Plan::where('activo', true)->orderBy('precio_mensual')->get();
         $suscripcionActual = Suscripcion::where('tenant_id', $tenant->id)
             ->where('estado', 'activa')
@@ -30,6 +36,10 @@ class BillingController extends Controller
             ->latest()
             ->first();
 
+        // DEBUG: dump datos
+        if (request()->has('debug')) {
+            dd(compact('tenant', 'planes', 'suscripcionActual'));
+        }
         return view('billing.index', compact('tenant', 'planes', 'suscripcionActual'));
     }
 
@@ -38,7 +48,8 @@ class BillingController extends Controller
      */
     public function checkout(Plan $plan): View
     {
-        $tenant = $this->tenantManager->get();
+        $tenant = $this->tenantManager->get() ?? auth()->user()?->tenant;
+        if (!$tenant) return redirect()->route('login');
 
         // Si es plan free, activar directo sin pago
         if ($plan->precio_mensual == 0) {
@@ -63,7 +74,8 @@ class BillingController extends Controller
             'culqi_token' => 'required|string',
         ]);
 
-        $tenant = $this->tenantManager->get();
+        $tenant = $this->tenantManager->get() ?? auth()->user()?->tenant;
+        if (!$tenant) return redirect()->route('login');
 
         try {
             $suscripcion = $this->billing->suscribir($tenant, $plan, $request->culqi_token);
@@ -81,7 +93,8 @@ class BillingController extends Controller
      */
     public function historial(): View
     {
-        $tenant = $this->tenantManager->get();
+        $tenant = $this->tenantManager->get() ?? auth()->user()?->tenant;
+        if (!$tenant) return redirect()->route('login');
         $suscripciones = Suscripcion::where('tenant_id', $tenant->id)
             ->with('plan')
             ->orderByDesc('created_at')

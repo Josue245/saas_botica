@@ -95,6 +95,9 @@
         </a>
 
         <p class="{{ $section }}">Ajustes &amp; Sistema</p>
+        <a href="{{ route('billing.index') }}" class="{{ $linkBase }} {{ request()->routeIs('billing.*') ? $linkActive : $linkIdle }}">
+            <x-icon name="credit-card" /> Mi Suscripción
+        </a>
         <a href="{{ route('personal.index') }}" class="{{ $linkBase }} {{ request()->routeIs('personal.*') ? $linkActive : $linkIdle }}">
             <x-icon name="badge" /> Gestión de Personal
         </a>

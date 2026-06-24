@@ -1,5 +1,6 @@
 <?php
 use App\Http\Controllers\Auth\TenantRegistrationController;
+use App\Http\Controllers\BillingController;
 
 use App\Http\Controllers\AlertaController;
 use App\Http\Controllers\AuditoriaController;
@@ -93,3 +94,12 @@ Route::middleware('auth')->group(function () {
 Route::get('/register', [TenantRegistrationController::class, 'create'])->name('register.tenant.form');
 Route::post('/register', [TenantRegistrationController::class, 'store'])->name('register.tenant');
 Route::get('/suspendido', fn() => view('billing.suspendido'))->name('billing.suspendido');
+
+// === BILLING ===
+Route::middleware(['auth'])->group(function () {
+    Route::get('/billing', [BillingController::class, 'index'])->name('billing.index');
+    Route::get('/billing/checkout/{plan}', [BillingController::class, 'checkout'])->name('billing.checkout');
+    Route::post('/billing/pagar/{plan}', [BillingController::class, 'pagar'])->name('billing.pagar');
+    Route::get('/billing/historial', [BillingController::class, 'historial'])->name('billing.historial');
+});
+Route::post('/webhook/culqi', [BillingController::class, 'webhook'])->name('billing.webhook');
