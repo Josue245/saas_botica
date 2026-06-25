@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\ComprobanteSunat;
 use App\Models\Venta;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -40,7 +41,7 @@ class VentaController extends Controller
         $numPagadas = (clone $resumen)->count();
         $ticketPromedio = $numPagadas > 0 ? $totalVendido / $numPagadas : 0;
 
-        $ventas = $base->with(['cliente', 'usuario'])
+        $ventas = $base->with(['cliente', 'usuario', 'comprobanteSunat'])
             ->latest()
             ->paginate(15)
             ->withQueryString();

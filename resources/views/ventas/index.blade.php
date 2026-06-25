@@ -82,6 +82,7 @@
                         <th class="px-5 py-3 font-semibold">Pago</th>
                         <th class="px-5 py-3 font-semibold text-right">Total</th>
                         <th class="px-5 py-3 font-semibold text-center">Estado</th>
+                        <th class="px-5 py-3 font-semibold text-center">SUNAT</th>
                         <th class="px-5 py-3 font-semibold text-right">Acciones</th>
                     </tr>
                 </thead>
@@ -99,6 +100,25 @@
                                     <span class="inline-flex px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">Pagada</span>
                                 @else
                                     <span class="inline-flex px-2 py-0.5 rounded-full bg-red-50 text-red-600 text-xs font-semibold">Anulada</span>
+                                @endif
+                            </td>
+                            <td class="px-5 py-3 text-center">
+                                @php
+                                    $compElec = $v->comprobanteSunat ?? null;
+                                @endphp
+                                @if($compElec)
+                                    <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium
+                                        {{ $compElec->estado === 'aceptado' ? 'bg-green-100 text-green-700' :
+                                           ($compElec->estado === 'rechazado' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700') }}">
+                                        {{ ucfirst($compElec->estado) }}
+                                    </span>
+                                @elseif($v->estado === 'pagada' && auth()->user()?->tenant?->puedeUsar('facturacion_electronica'))
+                                    <form method="POST" action="{{ route('facturacion.emitir', $v) }}">
+                                        @csrf
+                                        <button class="text-xs text-blue-600 hover:underline">Emitir</button>
+                                    </form>
+                                @else
+                                    <span class="text-xs text-gray-300">—</span>
                                 @endif
                             </td>
                             <td class="px-5 py-3">

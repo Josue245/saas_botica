@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Concerns\Auditable;
 use App\Models\Concerns\HasTenant;
+use App\Models\ComprobanteSunat;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -36,5 +37,9 @@ class Venta extends Model
     public function detalles(): HasMany
     {
         return $this->hasMany(VentaDetalle::class);
+    }
+    public function comprobanteSunat(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(ComprobanteSunat::class, 'venta_id');
     }
 }

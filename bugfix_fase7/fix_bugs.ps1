@@ -1,4 +1,136 @@
-﻿@extends('layouts.app')
+# Bugfix: historial ventas + sucursal activa + editar sucursal + dirección
+$ErrorActionPreference = "Stop"
+
+Write-Host "==> Aplicando 4 fixes..." -ForegroundColor Cyan
+
+# -----------------------------------------------------------------------
+# FIX 1: Botón "Emitir comprobante electrónico" en historial de ventas
+# -----------------------------------------------------------------------
+Write-Host ""
+Write-Host "FIX 1: Botón emitir comprobante en historial de ventas..." -ForegroundColor Yellow
+
+@'
+<?php
+$path = 'resources/views/ventas/index.blade.php';
+$c = file_get_contents($path);
+
+// Agregar columna SUNAT en el thead
+$c = str_replace(
+    '<th class="px-5 py-3 font-semibold text-right">Acciones</th>',
+    '<th class="px-5 py-3 font-semibold text-center">SUNAT</th>
+                        <th class="px-5 py-3 font-semibold text-right">Acciones</th>',
+    $c
+);
+
+// Agregar celda SUNAT en cada fila (antes de Acciones)
+$old = '                            <td class="px-5 py-3">
+                                <div class="flex items-center justify-end gap-1">
+                                    <a href="{{ route(\'pos.ticket\', $v) }}" target="_blank"';
+
+$new = '                            <td class="px-5 py-3 text-center">
+                                @php
+                                    $compElec = $v->comprobanteSunat ?? null;
+                                @endphp
+                                @if($compElec)
+                                    <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium
+                                        {{ $compElec->estado === \'aceptado\' ? \'bg-green-100 text-green-700\' :
+                                           ($compElec->estado === \'rechazado\' ? \'bg-red-100 text-red-700\' : \'bg-amber-100 text-amber-700\') }}">
+                                        {{ ucfirst($compElec->estado) }}
+                                    </span>
+                                @elseif($v->estado === \'pagada\' && auth()->user()?->tenant?->puedeUsar(\'facturacion_electronica\'))
+                                    <form method="POST" action="{{ route(\'facturacion.emitir\', $v) }}">
+                                        @csrf
+                                        <button class="text-xs text-blue-600 hover:underline">Emitir</button>
+                                    </form>
+                                @else
+                                    <span class="text-xs text-gray-300">—</span>
+                                @endif
+                            </td>
+                            <td class="px-5 py-3">
+                                <div class="flex items-center justify-end gap-1">
+                                    <a href="{{ route(\'pos.ticket\', $v) }}" target="_blank"';
+
+$c = str_replace($old, $new, $c);
+file_put_contents($path, $c);
+echo "FIX 1 OK: boton emitir comprobante agregado\n";
+'@ | Set-Content -Path "fix1_historial_sunat.php"
+docker compose exec app php fix1_historial_sunat.php
+
+# -----------------------------------------------------------------------
+# FIX 2: Cargar relación comprobanteSunat en VentaController
+# -----------------------------------------------------------------------
+Write-Host "FIX 2: Cargar comprobanteSunat en VentaController..." -ForegroundColor Yellow
+
+@'
+<?php
+$path = 'app/Http/Controllers/VentaController.php';
+$c = file_get_contents($path);
+
+// Agregar import del modelo
+if (strpos($c, 'ComprobanteSunat') === false) {
+    $c = str_replace(
+        "use App\Models\Venta;",
+        "use App\Models\ComprobanteSunat;\nuse App\Models\Venta;",
+        $c
+    );
+}
+
+// Agregar with(comprobanteSunat) al query de ventas
+$c = str_replace(
+    "->with(['cliente', 'usuario'])",
+    "->with(['cliente', 'usuario', 'comprobanteSunat'])",
+    $c
+);
+
+file_put_contents($path, $c);
+echo "FIX 2 OK: VentaController carga comprobanteSunat\n";
+'@ | Set-Content -Path "fix2_venta_controller.php"
+docker compose exec app php fix2_venta_controller.php
+
+# -----------------------------------------------------------------------
+# FIX 3: Relación comprobanteSunat en modelo Venta
+# -----------------------------------------------------------------------
+Write-Host "FIX 3: Relacion comprobanteSunat en modelo Venta..." -ForegroundColor Yellow
+
+@'
+<?php
+$path = 'app/Models/Venta.php';
+$c = file_get_contents($path);
+
+if (strpos($c, 'comprobanteSunat') !== false) {
+    echo "Relacion ya existe\n";
+    exit;
+}
+
+// Agregar import
+if (strpos($c, 'ComprobanteSunat') === false) {
+    $c = str_replace(
+        "use Illuminate\Database\Eloquent\Model;",
+        "use App\Models\ComprobanteSunat;\nuse Illuminate\Database\Eloquent\Model;",
+        $c
+    );
+}
+
+// Agregar relación al final de la clase (antes del cierre })
+$c = preg_replace(
+    '/^}$/m',
+    "    public function comprobanteSunat(): \\Illuminate\\Database\\Eloquent\\Relations\\HasOne\n    {\n        return \$this->hasOne(ComprobanteSunat::class, 'venta_id');\n    }\n}",
+    $c,
+    1
+);
+
+file_put_contents($path, $c);
+echo "FIX 3 OK: relacion comprobanteSunat en Venta\n";
+'@ | Set-Content -Path "fix3_venta_model.php"
+docker compose exec app php fix3_venta_model.php
+
+# -----------------------------------------------------------------------
+# FIX 4: Sucursal activa visual + editar + dirección
+# -----------------------------------------------------------------------
+Write-Host "FIX 4: Sucursal activa visual + editar + dirección..." -ForegroundColor Yellow
+
+$vistaContent = @'
+@extends('layouts.app')
 
 @section('titulo', 'Sucursales')
 
@@ -183,3 +315,34 @@
     </div>
 </div>
 @endsection
+'@
+
+$vistaContent | Set-Content -Path "resources\views\sucursales\index.blade.php" -Encoding UTF8
+Write-Host "FIX 4 OK: vista sucursales actualizada"
+
+# -----------------------------------------------------------------------
+# Limpiar cache y correr tests
+# -----------------------------------------------------------------------
+Write-Host ""
+Write-Host "==> Limpiando cache..." -ForegroundColor Cyan
+docker compose exec app php artisan view:clear
+docker compose exec app php artisan cache:clear
+
+Write-Host ""
+Write-Host "==> Tests de regresion..." -ForegroundColor Cyan
+docker compose exec app php artisan test `
+    --testsuite=Feature `
+    --filter="PosRegressionTest|CompraRegressionTest|CajaRegressionTest"
+
+Write-Host ""
+Write-Host "==> Commiteando..." -ForegroundColor Cyan
+git add .
+git commit -m "fix: boton emitir SUNAT en historial, sucursal activa visual, editar sucursal, dirección"
+git push origin feature/multitenant
+
+Write-Host ""
+Write-Host "4 fixes aplicados correctamente." -ForegroundColor Green
+Write-Host "   - Historial ventas: boton Emitir comprobante electronico"
+Write-Host "   - Sucursal activa: borde azul + badge check"
+Write-Host "   - Editar sucursal: modal con formulario completo"
+Write-Host "   - Direccion: corregido (ya no muestra 'Sin direccion' si hay valor)"
