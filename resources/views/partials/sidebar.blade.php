@@ -80,6 +80,7 @@
                 <a href="{{ route('inventario.index') }}" class="{{ $linkBase }} py-2 {{ request()->routeIs('inventario.index') ? $linkActive : $linkIdle }}">Stock Actual</a>
                 <a href="{{ route('inventario.lotes') }}" class="{{ $linkBase }} py-2 {{ request()->routeIs('inventario.lotes') ? $linkActive : $linkIdle }}">Lotes y Vencimientos</a>
                 <a href="{{ route('inventario.ajustes') }}" class="{{ $linkBase }} py-2 {{ request()->routeIs('inventario.ajustes') ? $linkActive : $linkIdle }}">Ajustes de Stock</a>
+                <a href="{{ route('stock.sucursales.index') }}" class="{{ $linkBase }} py-2 {{ request()->routeIs('stock.sucursales.*') ? $linkActive : $linkIdle }}">Stock por Sucursal</a>
             </div>
         </div>
 
@@ -115,7 +116,11 @@
         </a>
         <a href="{{ route('facturacion.index') }}" class="{{ $linkBase }} justify-between {{ request()->routeIs('facturacion.*') ? $linkActive : $linkIdle }}">
             <span class="flex items-center gap-3"><x-icon name="receipt" /> Facturación Electrónica</span>
-            <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-700 text-slate-300">OFF</span>
+            @if(auth()->user()?->tenant?->puedeUsar('facturacion_electronica'))
+                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-green-600 text-white">PRO</span>
+            @else
+                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-700 text-slate-300">FREE</span>
+            @endif
         </a>
 
         <div class="pt-3 mt-2 border-t border-white/10">

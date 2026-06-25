@@ -1,6 +1,7 @@
 <?php
 use App\Http\Controllers\Auth\TenantRegistrationController;
 use App\Http\Controllers\BillingController;
+use App\Http\Controllers\FacturacionController;
 use App\Http\Controllers\SucursalController;
 use App\Http\Controllers\StockSucursalController;
 
@@ -118,4 +119,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/stock-sucursales', [StockSucursalController::class, 'index'])->name('stock.sucursales.index');
     Route::post('/stock-sucursales/transferir', [StockSucursalController::class, 'transferir'])->name('stock.sucursales.transferir');
     Route::post('/stock-sucursales/poblar', [StockSucursalController::class, 'poblarDesdeProductos'])->name('stock.sucursales.poblar');
+});
+
+// === FACTURACIÓN ELECTRÓNICA ===
+Route::middleware(['auth'])->group(function () {
+    Route::get('/facturacion', [FacturacionController::class, 'index'])->name('facturacion.index');
+    Route::post('/facturacion/emitir/{venta}', [FacturacionController::class, 'emitir'])->name('facturacion.emitir');
+    Route::patch('/facturacion/reenviar/{comprobante}', [FacturacionController::class, 'reenviar'])->name('facturacion.reenviar');
+    Route::get('/facturacion/xml/{comprobante}', [FacturacionController::class, 'verXml'])->name('facturacion.xml');
 });

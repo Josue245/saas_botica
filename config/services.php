@@ -18,6 +18,11 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+    'nubefact' => [
+        'token' => env('NUBEFACT_TOKEN', ''),
+        'ruc'   => env('NUBEFACT_RUC', ''),
+        'url'   => env('NUBEFACT_URL', 'https://demo-facturacion.nubefact.com/api/v1'),
+    ],
     'culqi' => [
         'public_key'     => env('CULQI_PUBLIC_KEY', ''),
         'secret_key'     => env('CULQI_SECRET_KEY', ''),
