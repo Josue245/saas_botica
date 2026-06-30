@@ -97,7 +97,7 @@ class NubefactService
 
         $response = Http::withToken($this->token)
             ->timeout(30)
-            ->post("{$this->baseUrl}/invoices", $payload);
+            ->post($this->baseUrl, $payload);
 
         $data = $response->json();
 

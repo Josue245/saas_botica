@@ -9,3 +9,9 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::job(new CheckExpiredSubscriptionsJob)->dailyAt('02:00');
+
+// Backup diario de todos los tenants a las 3am
+Schedule::command('tenant:backup')->dailyAt('03:00');
+
+// Verificar suscripciones vencidas diariamente a las 2am  
+// Schedule::job(new App\Jobs\CheckExpiredSubscriptionsJob)->dailyAt('02:00');

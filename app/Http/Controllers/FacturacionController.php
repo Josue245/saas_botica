@@ -60,12 +60,20 @@ class FacturacionController extends Controller
             abort(403);
         }
 
+        // Validar: factura solo para clientes con RUC
+        if ($tipo === "factura") {
+                return back()->with("error", "Las facturas solo se pueden emitir a clientes con RUC. Use boleta para clientes con DNI.");
+            }
+        }
+
         // Verificar que no tiene comprobante ya emitido
         if (ComprobanteSunat::where('venta_id', $venta->id)->exists()) {
             return back()->with('error', 'Esta venta ya tiene un comprobante electrónico emitido.');
         }
 
-        $tipo = $venta->tipo_comprobante === 'factura' ? 'factura' : 'boleta';
+        // Usar tipo del request si viene, sino usar el de la venta
+        $tipoRequest = request()->input('tipo');
+        $tipo = in_array($tipoRequest, ['boleta', 'factura']) ? $tipoRequest : ($venta->tipo_comprobante === 'factura' ? 'factura' : 'boleta');
         $serie = $tipo === 'factura'
             ? ($venta->sucursal?->serie_factura ?? 'F001')
             : ($venta->sucursal?->serie_boleta ?? 'B001');

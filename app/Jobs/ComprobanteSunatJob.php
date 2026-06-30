@@ -26,7 +26,7 @@ class ComprobanteSunatJob implements ShouldQueue
 
     public function handle(XmlGeneratorService $xmlGenerator, NubefactService $nubefact): void
     {
-        $comprobante = ComprobanteSunat::with('venta.detalles.producto', 'venta.cliente', 'venta.user.tenant')
+        $comprobante = ComprobanteSunat::with('venta.detalles.producto', 'venta.cliente', 'venta.usuario.tenant')
             ->findOrFail($this->comprobanteId);
 
         // Marcar como enviando

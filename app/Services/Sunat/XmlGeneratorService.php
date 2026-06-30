@@ -20,8 +20,8 @@ class XmlGeneratorService
      */
     public function generar(Venta $venta, ComprobanteSunat $comprobante): string
     {
-        $venta->load(['detalles.producto', 'cliente', 'user.tenant']);
-        $tenant = $venta->user->tenant;
+        $venta->load(['detalles.producto', 'cliente', 'usuario.tenant']);
+        $tenant = $venta->usuario->tenant;
 
         $tipoDoc = $comprobante->tipo === 'factura' ? '01' : '03'; // 01=Factura, 03=Boleta
         $serie   = $comprobante->serie;

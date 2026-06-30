@@ -81,8 +81,10 @@ class SucursalController extends Controller
             'nombre'    => 'required|string|max:120',
             'direccion' => 'nullable|string|max:200',
             'telefono'  => 'nullable|string|max:30',
-            'activo'    => 'boolean',
         ]);
+
+        // Checkbox no envía nada si está desmarcado — manejar manualmente
+        $data['activo'] = $request->has('activo') ? true : false;
 
         $sucursal->update($data);
 
@@ -125,6 +127,10 @@ class SucursalController extends Controller
         auth()->user()->update(['sucursal_id' => $sucursal->id]);
         app()->instance('sucursal', $sucursal);
 
-        return back()->with('ok', "Sucursal activa: {$sucursal->nombre}");
+        // Forzar refresh de la sesión para que ResolveTenant lo detecte
+        request()->session()->put('sucursal_id', $sucursal->id);
+
+        return redirect()->route('sucursales.index')
+            ->with('ok', "Sucursal activa cambiada a: {$sucursal->nombre}");
     }
 }

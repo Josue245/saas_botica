@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'plan.limit'   => \App\Http\Middleware\CheckPlanLimits::class,
         ]);
         $middleware->appendToGroup("web", \App\Http\Middleware\ResolveTenant::class);
+        $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
         $middleware->validateCsrfTokens(except: ["webhook/culqi"]);
         $middleware->alias([
             'role' => \App\Http\Middleware\EnsureUserHasRole::class,

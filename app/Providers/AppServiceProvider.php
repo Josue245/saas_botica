@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
 use App\Services\TenantManager;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -20,6 +23,11 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Rate limiting: max 5 intentos de login por minuto por IP
+        RateLimiter::for("login", function (Request $request) {
+            return Limit::perMinute(5)->by($request->ip());
+        });
+
         // Evita errores de longitud de índice en MySQL < 5.7.7
         Schema::defaultStringLength(191);
         Paginator::useTailwind();
